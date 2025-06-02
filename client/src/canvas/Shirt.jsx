@@ -49,6 +49,6 @@ const Shirt = () => {
       </mesh>
     </group>
   )
-}
+};
 
-export default Shirt
+export default Shirt;

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Canvas } from '@react-three/fiber'
 import { Environment, Center } from '@react-three/drei';
 
@@ -24,6 +25,6 @@ const CanvasModel = () => {
       </CameraRig>
     </Canvas>
   )
-}
+};
 
-export default CanvasModel
+export default CanvasModel;

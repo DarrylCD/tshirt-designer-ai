@@ -32,6 +32,6 @@ const Backdrop = () => {
       />
     </AccumulativeShadows>
   )
-}
+};
 
-export default Backdrop
+export default Backdrop;
