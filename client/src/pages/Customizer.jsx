@@ -13,7 +13,7 @@ import {
     ColorPicker, 
     CustomButton, 
     FilePicker, 
-// TextPicker,
+    TextPicker,
     Tab } from '../components';
 
 const Customizer = () => {
@@ -43,6 +43,13 @@ const Customizer = () => {
         />
       case "aipicker":
         return <AIPicker 
+          prompt={prompt}
+          setPrompt={setPrompt}
+          generatingImg={generatingImg}
+          handleSubmit={handleSubmit}
+        />
+      case "textpicker":
+        return <TextPicker 
           prompt={prompt}
           setPrompt={setPrompt}
           generatingImg={generatingImg}
