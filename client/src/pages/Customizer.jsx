@@ -30,6 +30,9 @@ const Customizer = () => {
     stylishShirt: false,
   })
 
+  const [text, setText] = useState('');
+  const [generatingTxt, setGeneratingTxt] = useState(false);
+
   // show tab content depending on the activeTab
   const generateTabContent = () => {
     switch (activeEditorTab) {
@@ -50,9 +53,9 @@ const Customizer = () => {
         />
       case "textpicker":
         return <TextPicker 
-          prompt={prompt}
-          setPrompt={setPrompt}
-          generatingImg={generatingImg}
+          text={text}
+          setText={setText}
+          generatingTxt={generatingTxt}
           handleSubmit={handleSubmit}
         />
       default:
