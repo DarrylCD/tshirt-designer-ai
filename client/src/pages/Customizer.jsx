@@ -84,6 +84,23 @@ const Customizer = () => {
     handleDownloadPDF();
   };
 
+  function getImageDataUrl(src) {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function () {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+  }
+
   const handleSubmit = async (type) => {
     // if the type is text, we handle it differently
     if (type === 'textpicker') {
@@ -216,9 +233,25 @@ const Customizer = () => {
   const tshirtShape = `
     <rect x="56" y="56" width="400" height="400" rx="80" fill="${snap.color}" stroke="#222" stroke-width="4"/>
   `;
-  let logoImage = '';
-  if (state.isLogoTexture && snap.logoDecal) {
-    const logoDataUrl = snap.logoDecal.replace(/\s/g, '');
+  
+// filepath: c:\Users\darry\OneDrive\Documents\threejs\client\src\pages\Customizer.jsx
+let logoImage = '';
+if (state.isLogoTexture) {
+  let logoDataUrl = '';
+  if (snap.logoDecal) {
+    logoDataUrl = snap.logoDecal.replace(/\s/g, '');
+    // Use directly if already a data URL
+    logoImage = `
+      <image 
+        x="206" y="120" 
+        width="100" height="100"
+        href="${logoDataUrl}"
+        style="image-rendering:optimizeQuality"
+      />
+    `;
+  } else {
+    // Convert /threejs.png to data URL before using
+    logoDataUrl = await getImageDataUrl('/threejs.png');
     logoImage = `
       <image 
         x="206" y="120" 
@@ -228,6 +261,7 @@ const Customizer = () => {
       />
     `;
   }
+}
   let textSVG = '';
   if (state.textDecal && state.textDecal.text) {
     const { text, font, color } = state.textDecal;
@@ -338,9 +372,14 @@ const Customizer = () => {
   `;
 
   // 2. Logo image (if present)
-  let logoImage = '';
-  if (state.isLogoTexture && snap.logoDecal) {
-    const logoDataUrl = snap.logoDecal.replace(/\s/g, '');
+  
+// filepath: c:\Users\darry\OneDrive\Documents\threejs\client\src\pages\Customizer.jsx
+let logoImage = '';
+if (state.isLogoTexture) {
+  let logoDataUrl = '';
+  if (snap.logoDecal) {
+    logoDataUrl = snap.logoDecal.replace(/\s/g, '');
+    // Use directly if already a data URL
     logoImage = `
       <image 
         x="206" y="120" 
@@ -349,6 +388,18 @@ const Customizer = () => {
         style="image-rendering:optimizeQuality"
       />
     `;
+  } else {
+    // Convert /threejs.png to data URL before using
+    logoDataUrl = await getImageDataUrl('/threejs.png');
+    logoImage = `
+      <image 
+        x="206" y="120" 
+        width="100" height="100"
+        href="${logoDataUrl}"
+        style="image-rendering:optimizeQuality"
+      />
+    `;
+  }
   }
 
   // 3. Text decal (if present)
