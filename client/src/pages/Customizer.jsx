@@ -224,7 +224,6 @@ const Customizer = () => {
         x="206" y="120" 
         width="100" height="100"
         href="${logoDataUrl}"
-        xlink:href="${logoDataUrl}"
         style="image-rendering:optimizeQuality"
       />
     `;
@@ -347,7 +346,6 @@ const Customizer = () => {
         x="206" y="120" 
         width="100" height="100"
         href="${logoDataUrl}"
-        xlink:href="${logoDataUrl}"
         style="image-rendering:optimizeQuality"
       />
     `;

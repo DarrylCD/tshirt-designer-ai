@@ -1,5 +1,5 @@
 import React from 'react'
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { easing } from 'maath';
 import { useSnapshot } from 'valtio';
 import { useFrame } from '@react-three/fiber';
@@ -14,17 +14,59 @@ const Shirt = () => {
 
   const logoTexture = useTexture(snap.logoDecal);
   const fullTexture = useTexture(snap.fullDecal);
-
+  const [textTexture, setTextTexture] = useState(null);
   useFrame((state, delta) => easing.dampC(materials.lambert1.color, snap.color, 0.25, delta));
-  const textTexture = useMemo(() => {
-    if (snap.textDecal && snap.textDecal.text) {
-      const canvas = createTextTexture(snap.textDecal);
-      return new THREE.CanvasTexture(canvas);
+  // const textTexture = useMemo(() => {
+  //   if (snap.textDecal && snap.textDecal.text) {
+  //     const canvas = createTextTexture(snap.textDecal);
+  //     return new THREE.CanvasTexture(canvas);
+  //   }
+  //   return null;
+  // }, [snap.textDecal]);
+  useEffect(() => {
+    let cancelled = false;
+    async function updateTexture() {
+      if (snap.textDecal && snap.textDecal.text) {
+        const canvas = await createTextTexture(snap.textDecal);
+        if (!cancelled) setTextTexture(new THREE.CanvasTexture(canvas));
+      } else {
+        setTextTexture(null);
+      }
     }
-    return null;
+    updateTexture();
+    return () => { cancelled = true; };
   }, [snap.textDecal]);
 
-  const textY = snap.logoDecal ? 0.04 - 0.08 : 0.04; // Move text lower if logo is present
+  // Improved textY calculation: always below the logo, with extra space for more lines
+  let textY = 0.04; // default (center chest)
+  if (snap.logoDecal && snap.textDecal && snap.textDecal.text) {
+  // Estimate number of lines (same logic as createTextTexture)
+  const font = snap.textDecal.font || 'Arial';
+  const fontSize = 48;
+  const maxWidth = 440;
+  const words = snap.textDecal.text.split(' ');
+  let lines = [];
+  let currentLine = words[0];
+  const tempCanvas = document.createElement('canvas');
+  const ctx = tempCanvas.getContext('2d');
+  ctx.font = `bold ${fontSize}px ${font}`;
+  for (let i = 1; i < words.length; i++) {
+    const word = words[i];
+    const width = ctx.measureText(currentLine + ' ' + word).width;
+    if (width < maxWidth) {
+      currentLine += ' ' + word;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  lines.push(currentLine);
+
+  // Always start below the logo, add extra for more lines
+  const logoBottom = 0.04 - 0.075; // logo center + half logo height
+  const gapBelowLogo = 0.06; // fixed gap
+  textY = logoBottom - gapBelowLogo - (lines.length - 1) * 0.025;
+  }
   const stateString = JSON.stringify(snap); // this tracks state changes
 
   return (
@@ -73,12 +115,21 @@ const Shirt = () => {
   )
 };
 
-function createTextTexture({ text, font, color }) {
+async  function createTextTexture({ text, font, color }) {
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 512;
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, 512, 512);
+  // Wait for the font to load if it's custom
+  if (font !== 'Arial') {
+    try {
+      // Wait for the font to be available
+      await document.fonts.load(`bold 48px "${font}"`);
+    } catch (e) {
+      // fallback: do nothing
+    }
+  }
   ctx.font = `bold 48px ${font}`;
   ctx.fillStyle = color;
   ctx.textAlign = 'center';
