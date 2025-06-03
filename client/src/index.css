@@ -16,6 +16,20 @@ html {
   }
 }
 
+@font-face {
+  font-family: 'Simpsons';
+  src: url('/fonts/simpsons.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Tangerine';
+  src: url('/fonts/tangerine.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .app {
   @apply relative w-full h-screen overflow-hidden;
 }

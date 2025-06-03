@@ -89,7 +89,7 @@ const Customizer = () => {
       }
       return;
     }  
-    if (type === 'aipicker') {
+    if (type === 'logo' || type === 'full') {
     if(!prompt) return alert("Please enter a prompt");
     try {
       setGeneratingImg(true);
