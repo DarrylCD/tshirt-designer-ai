@@ -158,6 +158,56 @@ const Customizer = () => {
       })
   }
 
+  const handleDownloadPNG = () => {
+  const canvas = document.querySelector('canvas');
+  if (!canvas) {
+    alert('No canvas found!');
+    return;
+  }
+  const dataURL = canvas.toDataURL('image/png');
+  const link = document.createElement('a');
+  link.href = dataURL;
+  link.download = 'tshirt-design.png';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  };
+
+  const handleDownloadSVG = () => {
+  // Only export the text decal as SVG
+  if (!state.textDecal || !state.textDecal.text) {
+    alert('No text decal to export!');
+    return;
+  }
+  const { text, font, color } = state.textDecal;
+  // Basic word wrap for SVG (optional)
+  const lines = text.split('\n');
+  const fontSize = 48;
+  const lineHeight = 60;
+  const svgWidth = 512;
+  const svgHeight = 512;
+  const yStart = svgHeight / 2 - ((lines.length - 1) * lineHeight) / 2;
+
+  let svgText = '';
+  lines.forEach((line, i) => {
+    svgText += `<text x="50%" y="${yStart + i * lineHeight}" text-anchor="middle" font-family="${font}" font-size="${fontSize}" fill="${color}" dominant-baseline="middle">${line}</text>`;
+  });
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}">
+      ${svgText}
+    </svg>
+  `.trim();
+
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'tshirt-text.svg';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  };
+
   return (
     <AnimatePresence>
       {!snap.intro && (
@@ -207,6 +257,22 @@ const Customizer = () => {
                 handleClick={() => handleActiveFilterTab(tab.name)}
               />
             ))}
+          </motion.div>
+          <motion.div
+            className="absolute bottom-5 right-5 z-20"
+          >
+            <CustomButton
+              type="filled"
+              title="Download PNG"
+              handleClick={handleDownloadPNG}
+              customStyles="w-fit px-4 py-2.5 font-bold text-sm"
+            />
+            <CustomButton
+              type="outline"
+              title="Download SVG"
+              handleClick={handleDownloadSVG}
+              customStyles="w-fit px-4 py-2.5 font-bold text-sm ml-2"
+            />
           </motion.div>
         </>
       )}
