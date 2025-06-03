@@ -31,6 +31,8 @@ const Customizer = () => {
   })
 
   const [text, setText] = useState('');
+  const [font, setFont] = useState('Arial');
+  const [color, setColor] = useState('#000000');
   const [generatingTxt, setGeneratingTxt] = useState(false);
 
   // show tab content depending on the activeTab
@@ -55,6 +57,10 @@ const Customizer = () => {
         return <TextPicker 
           text={text}
           setText={setText}
+          font={font}
+          setFont={setFont}
+          color={color}
+          setColor={setColor}
           generatingTxt={generatingTxt}
           handleSubmit={handleSubmit}
         />
@@ -64,8 +70,27 @@ const Customizer = () => {
   }
 
   const handleSubmit = async (type) => {
+    // if the type is text, we handle it differently
+    if (type === 'textpicker') {
+      console.log('TextPicker submit:', text, font, color);
+      if (!text) return alert("Please enter some text");
+      setGeneratingTxt(true);
+      try {
+        state.textDecal = {
+          text,
+          font,
+          color,
+        };
+      } catch (error) {
+        alert(error);
+      } finally {
+        setGeneratingTxt(false);
+        setActiveEditorTab("");
+      }
+      return;
+    }  
+    if (type === 'aipicker') {
     if(!prompt) return alert("Please enter a prompt");
-
     try {
       setGeneratingImg(true);
 
@@ -88,6 +113,7 @@ const Customizer = () => {
       setGeneratingImg(false);
       setActiveEditorTab("");
     }
+  }
   }
 
   const handleDecals = (type, result) => {
