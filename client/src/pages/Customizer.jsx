@@ -217,7 +217,7 @@ const Customizer = () => {
     <rect x="56" y="56" width="400" height="400" rx="80" fill="${snap.color}" stroke="#222" stroke-width="4"/>
   `;
   let logoImage = '';
-  if (snap.logoDecal) {
+  if (state.isLogoTexture && snap.logoDecal) {
     const logoDataUrl = snap.logoDecal.replace(/\s/g, '');
     logoImage = `
       <image 
@@ -339,7 +339,7 @@ const Customizer = () => {
 
   // 2. Logo image (if present)
   let logoImage = '';
-  if (snap.logoDecal) {
+  if (state.isLogoTexture && snap.logoDecal) {
     const logoDataUrl = snap.logoDecal.replace(/\s/g, '');
     logoImage = `
       <image 
