@@ -2,7 +2,7 @@ import React from 'react'
 import CustomButton from './CustomButton'
 
 const fonts = [
-  'Arial', 'Courier New', 'Georgia', 'Simpsons', 'Times New Roman', 'Tangerine', 'Verdana',
+  'Arial', 'Courier New', 'Georgia', 'Impact', 'Simpsons', 'Times New Roman', 'Tangerine', 'Verdana',
 ];
 const TextPicker = ({
   text,

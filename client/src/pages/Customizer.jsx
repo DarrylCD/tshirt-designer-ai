@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSnapshot } from 'valtio';
-
+import opentype from 'opentype.js';
 import config from '../config/config';
 import state from '../store';
 import { download } from '../assets';
@@ -173,6 +173,25 @@ const Customizer = () => {
       })
   }
 
+  // Returns an array of SVG path strings for each line
+  async function textToSVGPaths({ text, fontUrl, fontSize, x, yStart, lineHeight, fill }) {
+  const font = await opentype.load(fontUrl);
+  const lines = Array.isArray(text) ? text : text.split('\n');
+  let paths = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    // Measure line width in font units
+    const path = font.getPath(line, 0, 0, fontSize, { features: { liga: true } });
+    const metrics = path.getBoundingBox();
+    const lineWidth = metrics.x2 - metrics.x1;
+    // Center the line at x
+    const xOffset = x - lineWidth / 2;
+    // Now create the path at the correct position
+    const centeredPath = font.getPath(line, xOffset, yStart + i * lineHeight, fontSize, { features: { liga: true } });
+    paths.push(`<path d="${centeredPath.toPathData()}" fill="${fill}" />`);
+  }
+  return paths;
+  }
   const handleDownloadPNG = () => {
   const canvas = document.querySelector('canvas');
   if (!canvas) {
@@ -188,7 +207,7 @@ const Customizer = () => {
   document.body.removeChild(link);
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
   // Use the same SVG as your SVG download
   const svgWidth = 512;
   const svgHeight = 512;
@@ -228,9 +247,29 @@ const Customizer = () => {
     } else {
       yStart = 320 - ((lines.length - 1) * lineHeight) / 2;
     }
-    lines.forEach((line, i) => {
-      textSVG += `<text x="256" y="${yStart + i * lineHeight}" text-anchor="middle" font-family="${font}" font-size="${fontSize}" fill="${color}" dominant-baseline="middle">${line}</text>`;
+    // Map font name to font file URL (adjust as needed)
+    const fontMap = {
+      'Arial': '/fonts/arial.ttf',
+      'Courier New': '/fonts/cour.ttf',
+      'Georgia': '/fonts/georgia.ttf',
+      'Impact': '/fonts/impact.ttf',
+      'Simpsons': '/fonts/simpsons.ttf',
+      'Tangerine': '/fonts/tangerine.ttf',
+      'Times New Roman': '/fonts/times.ttf',
+      'Verdana': '/fonts/verdana.ttf',
+    };
+    const fontUrl = fontMap[font] || fontMap['Arial'];
+    // Convert text to SVG paths (outlined)
+    const paths = await textToSVGPaths({
+      text: lines,
+      fontUrl,
+      fontSize,
+      x: 256,
+      yStart,
+      lineHeight,
+      fill: color
     });
+    textSVG = paths.join('\n');
   }
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${svgWidth}" height="${svgHeight}">
@@ -284,7 +323,7 @@ const Customizer = () => {
     return lines;
   }
 
-  const handleDownloadSVG = () => {
+  const handleDownloadSVG = async () => {
   // Only export if there's something to export
   if (!state.textDecal && !snap.logoDecal) {
     alert('No design to export!');
@@ -340,9 +379,35 @@ const Customizer = () => {
       yStart = 320 - ((lines.length - 1) * lineHeight) / 2;
     }
 
-    lines.forEach((line, i) => {
-      textSVG += `<text x="256" y="${yStart + i * lineHeight}" text-anchor="middle" font-family="${font}" font-size="${fontSize}" fill="${color}" dominant-baseline="middle">${line}</text>`;
-    });
+  //   lines.forEach((line, i) => {
+  //     textSVG += `<text x="256" y="${yStart + i * lineHeight}" text-anchor="middle" font-family="${font}" font-size="${fontSize}" fill="${color}" dominant-baseline="middle">${line}</text>`;
+  //   });
+  // }
+
+  // Map font name to font file URL (adjust as needed)
+  const fontMap = {
+    'Arial': '/fonts/arial.ttf',
+    'Courier New': '/fonts/cour.ttf',
+    'Georgia': '/fonts/georgia.ttf',
+    'Impact': '/fonts/impact.ttf',
+    'Simpsons': '/fonts/simpsons.ttf',
+    'Tangerine': '/fonts/tangerine.ttf',
+    'Times New Roman': '/fonts/times.ttf',
+    'Verdana': '/fonts/verdana.ttf',
+  };
+  const fontUrl = fontMap[font] || fontMap['Arial'];
+
+  // Convert text to SVG paths (outlined)
+  const paths = await textToSVGPaths({
+    text: lines,
+    fontUrl,
+    fontSize,
+    x: 256,
+    yStart,
+    lineHeight,
+    fill: color
+  });
+  textSVG = paths.join('\n');
   }
 
   // 4. Compose SVG
