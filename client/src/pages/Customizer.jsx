@@ -15,11 +15,13 @@ import {
     FilePicker, 
     TextPicker,
     Tab } from '../components';
+import jsPDF from 'jspdf';
 
 const Customizer = () => {
   const snap = useSnapshot(state);
 
   const [file, setFile] = useState('');
+  const [activeDownload, setActiveDownload] = useState("");
 
   const [prompt, setPrompt] = useState('');
   const [generatingImg, setGeneratingImg] = useState(false);
@@ -68,6 +70,19 @@ const Customizer = () => {
         return null;
     }
   }
+
+  const handleDownloadPNGClick = () => {
+    setActiveDownload("png");
+    handleDownloadPNG();
+  };
+  const handleDownloadSVGClick = () => {
+    setActiveDownload("svg");
+    handleDownloadSVG();
+  };
+  const handleDownloadPDFClick = () => {
+    setActiveDownload("pdf");
+    handleDownloadPDF();
+  };
 
   const handleSubmit = async (type) => {
     // if the type is text, we handle it differently
@@ -171,6 +186,83 @@ const Customizer = () => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  };
+
+  const handleDownloadPDF = () => {
+  // Use the same SVG as your SVG download
+  const svgWidth = 512;
+  const svgHeight = 512;
+
+  // Compose SVG as in handleDownloadSVG
+  const tshirtShape = `
+    <rect x="56" y="56" width="400" height="400" rx="80" fill="${snap.color}" stroke="#222" stroke-width="4"/>
+  `;
+  let logoImage = '';
+  if (snap.logoDecal) {
+    const logoDataUrl = snap.logoDecal.replace(/\s/g, '');
+    logoImage = `
+      <image 
+        x="206" y="120" 
+        width="100" height="100"
+        href="${logoDataUrl}"
+        xlink:href="${logoDataUrl}"
+        style="image-rendering:optimizeQuality"
+      />
+    `;
+  }
+  let textSVG = '';
+  if (state.textDecal && state.textDecal.text) {
+    const { text, font, color } = state.textDecal;
+    const fontSize = 48;
+    const lineHeight = 60;
+    const maxWidth = 440;
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = 512;
+    tempCanvas.height = 512;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.font = `bold ${fontSize}px ${font}`;
+    const lines = wrapTextToLines(text, tempCtx, maxWidth);
+    let yStart;
+    if (state.isLogoTexture && snap.logoDecal) {
+      yStart = 240 + 30;
+    } else {
+      yStart = 320 - ((lines.length - 1) * lineHeight) / 2;
+    }
+    lines.forEach((line, i) => {
+      textSVG += `<text x="256" y="${yStart + i * lineHeight}" text-anchor="middle" font-family="${font}" font-size="${fontSize}" fill="${color}" dominant-baseline="middle">${line}</text>`;
+    });
+  }
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${svgWidth}" height="${svgHeight}">
+      ${tshirtShape}
+      ${logoImage}
+      ${textSVG}
+    </svg>
+  `.trim();
+
+  // Convert SVG to PNG for embedding in PDF
+  const svgBlob = new Blob([svg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(svgBlob);
+  const img = new window.Image();
+  img.onload = function () {
+    const canvas = document.createElement('canvas');
+    canvas.width = svgWidth;
+    canvas.height = svgHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const pngData = canvas.toDataURL('image/png');
+
+    // Create PDF and add PNG
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'pt',
+      format: [svgWidth, svgHeight]
+    });
+    pdf.addImage(pngData, 'PNG', 0, 0, svgWidth, svgHeight);
+    pdf.save('tshirt-design.pdf');
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
   };
 
   function wrapTextToLines(text, ctx, maxWidth) {
@@ -326,15 +418,21 @@ const Customizer = () => {
             className="absolute bottom-5 right-5 z-20"
           >
             <CustomButton
-              type="filled"
+              type={activeDownload === "png" ? "filled" : "outline"}
               title="Download PNG"
-              handleClick={handleDownloadPNG}
+              handleClick={handleDownloadPNGClick}
               customStyles="w-fit px-4 py-2.5 font-bold text-sm"
             />
             <CustomButton
-              type="outline"
+              type={activeDownload === "svg" ? "filled" : "outline"}
               title="Download SVG"
-              handleClick={handleDownloadSVG}
+              handleClick={handleDownloadSVGClick}
+              customStyles="w-fit px-4 py-2.5 font-bold text-sm ml-2"
+            />
+            <CustomButton
+              type={activeDownload === "pdf" ? "filled" : "outline"}
+              title="Download PDF"
+              handleClick={handleDownloadPDFClick}
               customStyles="w-fit px-4 py-2.5 font-bold text-sm ml-2"
             />
           </motion.div>
