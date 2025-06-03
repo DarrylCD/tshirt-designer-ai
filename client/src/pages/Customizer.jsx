@@ -173,36 +173,100 @@ const Customizer = () => {
   document.body.removeChild(link);
   };
 
+  function wrapTextToLines(text, ctx, maxWidth) {
+    const words = text.split(' ');
+    let lines = [];
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+      const word = words[i];
+      const width = ctx.measureText(currentLine + ' ' + word).width;
+      if (width < maxWidth) {
+        currentLine += ' ' + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    lines.push(currentLine);
+    return lines;
+  }
+
   const handleDownloadSVG = () => {
-  // Only export the text decal as SVG
-  if (!state.textDecal || !state.textDecal.text) {
-    alert('No text decal to export!');
+  // Only export if there's something to export
+  if (!state.textDecal && !snap.logoDecal) {
+    alert('No design to export!');
     return;
   }
-  const { text, font, color } = state.textDecal;
-  // Basic word wrap for SVG (optional)
-  const lines = text.split('\n');
-  const fontSize = 48;
-  const lineHeight = 60;
+
   const svgWidth = 512;
   const svgHeight = 512;
-  const yStart = svgHeight / 2 - ((lines.length - 1) * lineHeight) / 2;
 
-  let svgText = '';
-  lines.forEach((line, i) => {
-    svgText += `<text x="50%" y="${yStart + i * lineHeight}" text-anchor="middle" font-family="${font}" font-size="${fontSize}" fill="${color}" dominant-baseline="middle">${line}</text>`;
-  });
+  // 1. T-shirt shape (simple rounded rectangle as a placeholder)
+  const tshirtShape = `
+    <rect x="56" y="56" width="400" height="400" rx="80" fill="${snap.color}" stroke="#222" stroke-width="4"/>
+  `;
 
+  // 2. Logo image (if present)
+  let logoImage = '';
+  if (snap.logoDecal) {
+    const logoDataUrl = snap.logoDecal.replace(/\s/g, '');
+    logoImage = `
+      <image 
+        x="206" y="120" 
+        width="100" height="100"
+        href="${logoDataUrl}"
+        xlink:href="${logoDataUrl}"
+        style="image-rendering:optimizeQuality"
+      />
+    `;
+  }
+
+  // 3. Text decal (if present)
+  let textSVG = '';
+  if (state.textDecal && state.textDecal.text) {
+    const { text, font, color } = state.textDecal;
+    // const lines = text.split('\n');
+    const fontSize = 48;
+    const lineHeight = 60;
+    const maxWidth = 440;
+
+    // Create a temporary canvas context for measuring text width
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = 512;
+    tempCanvas.height = 512;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.font = `bold ${fontSize}px ${font}`;
+
+    // Use the same word wrap as the T-shirt preview
+    const lines = wrapTextToLines(text, tempCtx, maxWidth);
+
+    let yStart;
+    if (state.isLogoTexture && snap.logoDecal) {
+    yStart = 240 + 30; // below logo
+    } else {
+      yStart = 320 - ((lines.length - 1) * lineHeight) / 2;
+    }
+
+    lines.forEach((line, i) => {
+      textSVG += `<text x="256" y="${yStart + i * lineHeight}" text-anchor="middle" font-family="${font}" font-size="${fontSize}" fill="${color}" dominant-baseline="middle">${line}</text>`;
+    });
+  }
+
+  // 4. Compose SVG
   const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}">
-      ${svgText}
-    </svg>
+  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${svgWidth}" height="${svgHeight}">
+    ${tshirtShape}
+    ${logoImage}
+    ${textSVG}
+  </svg>
   `.trim();
 
+  // 5. Download SVG
   const blob = new Blob([svg], { type: 'image/svg+xml' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.download = 'tshirt-text.svg';
+  link.download = 'tshirt-design.svg';
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

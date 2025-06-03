@@ -24,6 +24,7 @@ const Shirt = () => {
     return null;
   }, [snap.textDecal]);
 
+  const textY = snap.logoDecal ? 0.04 - 0.08 : 0.04; // Move text lower if logo is present
   const stateString = JSON.stringify(snap); // this tracks state changes
 
   return (
@@ -58,7 +59,7 @@ const Shirt = () => {
 
         {snap.textDecal && snap.textDecal.text && textTexture && (
           <Decal
-            position={[0, 0.04, 0.15]}
+            position={[0, textY, 0.15]}
             rotation={[0, 0, 0]}
             scale={0.15}
             map={textTexture}
