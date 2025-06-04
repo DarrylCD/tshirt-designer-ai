@@ -11,6 +11,8 @@ const TextPicker = ({
   setFont,
   color,
   setColor,
+  fontSize,
+  setFontSize,
   generatingTxt,
   handleSubmit,
 }) => {
@@ -41,6 +43,15 @@ const TextPicker = ({
           value={color}
           onChange={e => setColor(e.target.value)}
           className="w-8 h-8 p-0 border-none bg-transparent"
+        />
+        <input
+          type="number"
+          min={12}
+          max={128}
+          value={fontSize}
+          onChange={e => setFontSize(Number(e.target.value))}
+          className="your-input-class"
+          placeholder="Font size"
         />
       </div>
       <div className="flex gap-3">

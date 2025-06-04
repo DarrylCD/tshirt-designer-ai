@@ -37,6 +37,7 @@ const Customizer = () => {
   const [text, setText] = useState('');
   const [font, setFont] = useState('Arial');
   const [color, setColor] = useState('#000000');
+  const [fontSize, setFontSize] = useState(48);
   const [generatingTxt, setGeneratingTxt] = useState(false);
 
   useEffect(() => {
@@ -72,6 +73,8 @@ const Customizer = () => {
           setFont={setFont}
           color={color}
           setColor={setColor}
+          fontSize={fontSize}
+          setFontSize={setFontSize}
           generatingTxt={generatingTxt}
           handleSubmit={handleSubmit}
         />
@@ -113,7 +116,7 @@ const Customizer = () => {
   const handleSubmit = async (type) => {
     // if the type is text, we handle it differently
     if (type === 'textpicker') {
-      console.log('TextPicker submit:', text, font, color);
+      console.log('TextPicker submit:', text, font, color, fontSize);
       if (!text) return alert("Please enter some text");
       setGeneratingTxt(true);
       try {
@@ -121,6 +124,7 @@ const Customizer = () => {
           text,
           font,
           color,
+          fontSize,
         };
       } catch (error) {
         alert(error);
@@ -264,8 +268,8 @@ const Customizer = () => {
 
     let textSVG = '';
     if (state.textDecal && state.textDecal.text) {
-      const { text, font, color } = state.textDecal;
-      const fontSize = 48;
+      const { text, font, color, } = state.textDecal;
+      const fontSize = state.textDecal?.fontSize || 48;
       const lineHeight = 60;
       const maxWidth = 440;
       const tempCanvas = document.createElement('canvas');
@@ -397,7 +401,7 @@ const Customizer = () => {
     let textSVG = '';
     if (state.textDecal && state.textDecal.text) {
       const { text, font, color } = state.textDecal;
-      const fontSize = 48;
+      const fontSize = state.textDecal?.fontSize || 48;
       const lineHeight = 60;
       const maxWidth = 440;
 
@@ -495,7 +499,7 @@ const Customizer = () => {
               type="filled"
               title="Go Back"
               handleClick={() => state.intro = true}
-              customStyles="w-fit px-4 py-2.5 font-bold text-sm"
+              customStyles="w-fit px-4 py-2.5 font-bold text-sm cursor-pointer"
             />
           </motion.div>
 
@@ -520,19 +524,19 @@ const Customizer = () => {
               type={activeDownload === "png" ? "filled" : "outline"}
               title="Download PNG"
               handleClick={handleDownloadPNGClick}
-              customStyles="w-fit px-4 py-2.5 font-bold text-sm"
+              customStyles="w-fit px-4 py-2.5 font-bold text-sm cursor-pointer"
             />
             <CustomButton
               type={activeDownload === "svg" ? "filled" : "outline"}
               title="Download SVG"
               handleClick={handleDownloadSVGClick}
-              customStyles="w-fit px-4 py-2.5 font-bold text-sm ml-2"
+              customStyles="w-fit px-4 py-2.5 font-bold text-sm ml-2 cursor-pointer"
             />
             <CustomButton
               type={activeDownload === "pdf" ? "filled" : "outline"}
               title="Download PDF"
               handleClick={handleDownloadPDFClick}
-              customStyles="w-fit px-4 py-2.5 font-bold text-sm ml-2"
+              customStyles="w-fit px-4 py-2.5 font-bold text-sm ml-2 cursor-pointer"
             />
           </motion.div>
         </>
