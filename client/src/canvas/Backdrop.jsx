@@ -12,25 +12,29 @@ const Backdrop = () => {
       temporal
       frames={60}
       alphaTest={0.85}
-      scae={10}
+      scale={10}
       rotation={[Math.PI / 2, 0, 0]}
-      position={[0, 0, -0.14]}
+      position={[0, 0, -0.4]}
+      color="#bbbbbb"
+      colorBlend={0.3}
+      opacity={0.4}
     >
-      <RandomizedLight 
+      <RandomizedLight
         amount={4}
         radius={9}
-        intensity={0.55}
-        ambient={0.25}
+        intensity={0.3}
+        ambient={0.4}
         position={[5, 5, -10]}
       />
-      <RandomizedLight 
+      <RandomizedLight
         amount={4}
         radius={5}
-        intensity={0.25}
-        ambient={0.55}
+        intensity={0.15}
+        ambient={0.6}
         position={[-5, 5, -9]}
       />
     </AccumulativeShadows>
+
   )
 };
 

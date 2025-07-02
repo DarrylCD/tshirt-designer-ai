@@ -18,6 +18,8 @@ const CanvasModel = () => {
       <Environment preset="city" />
 
       <CameraRig>
+        <color attach="background" args={['#f8f8f8']} />
+
         <Backdrop />
         <Center>
           <Shirt />
