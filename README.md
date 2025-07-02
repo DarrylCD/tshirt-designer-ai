@@ -8,7 +8,7 @@ Create unique T-shirt designs in just a few clicks! This web app lets you fully 
 - 🤖 AI-generated designs (via OpenAI)
 - 📥 Downloadable print-ready files
 
-Whether you're prototyping apparel, mocking merch for a brand, or just exploring your creativity — **this designer tool is built for makers**.
+Whether you're prototyping apparel, mocking merch for a brand, or just exploring your creativity, **this designer tool is built for makers**.
 
 ---
 
@@ -25,11 +25,10 @@ Whether you're prototyping apparel, mocking merch for a brand, or just exploring
 
 ## 📸 Preview
 
-| Design View | Custom Panel | AI Prompt |
+| Home | Customizer | AI Prompt |
 |:--:|:--:|:--:|
-| ![Design](https://via.placeholder.com/300x180?text=Shirt+Render) | ![Panel](https://via.placeholder.com/300x180?text=UI+Controls) | ![AI](https://via.placeholder.com/300x180?text=AI+Prompt) |
+| ![Home](https://cdn.imgchest.com/files/46acqb8zlq7.png) | ![Customizer](https://cdn.imgchest.com/files/yxkczgv2bn7.png) | ![AI](https://cdn.imgchest.com/files/7kzcab9nvx7.png) |
 
-_(Replace the images above with actual screenshots or hosted images)_
 
 ---
 
