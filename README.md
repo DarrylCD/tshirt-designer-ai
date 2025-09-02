@@ -12,6 +12,15 @@ Whether you're prototyping apparel, mocking merch for a brand, or just exploring
 
 ---
 
+## 🚀 Live Demo
+
+🌐 **Frontend (Netlify):** [T-shirt Designer Demo](https://tshirtdesignerbydcd.netlify.app/)  
+⚙️ **Backend :** Hosted on Render  
+- Local development: http://localhost:8080  
+- Production URL is set in the `.env` file as `VITE_BACKEND_URL`
+
+---
+
 ## 🚀 Features
 
 - ✅ Real-time 3D shirt rendering using **three.js**
