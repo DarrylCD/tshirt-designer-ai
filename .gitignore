@@ -25,3 +25,8 @@ dist-ssr
 
 # misc
 .env
+
+# Ignore environment variables
+*.env
+*.env.*
+!*.env.example
